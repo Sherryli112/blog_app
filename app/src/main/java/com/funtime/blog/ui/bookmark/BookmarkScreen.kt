@@ -62,7 +62,7 @@ fun BookmarkScreen(
                             ArticleCard(
                                 article = article.toItemDto(),
                                 onClick = onArticleClick,
-                                onLongClick = { pendingDeleteSlug = article.slug }
+                                onLongClick = { article.slug?.let { pendingDeleteSlug = it } }
                             )
                         }
                     }
