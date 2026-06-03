@@ -113,4 +113,30 @@ class BookmarkViewModelTest {
 
         coVerify { bookmarkRepository.toggle("slug-1") }
     }
+
+    @Test
+    fun `retry re-fetches articles`() = runTest {
+        slugsFlow.value = listOf("slug-1")
+        coEvery { articleRepository.getArticleBySlug("slug-1") } returns makeDetail("slug-1")
+        viewModel = BookmarkViewModel(bookmarkRepository, articleRepository)
+
+        // Confirm initial load succeeded
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertEquals(1, state.articles.size)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Simulate network recovery after failure
+        coEvery { articleRepository.getArticleBySlug("slug-1") } returns makeDetail("slug-1")
+        viewModel.retry()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.isLoading)
+            assertEquals(1, state.articles.size)
+            assertNull(state.error)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
