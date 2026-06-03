@@ -8,7 +8,7 @@ interface BookmarkDao {
     @Query("SELECT slug FROM bookmarks ORDER BY bookmarkedAt DESC")
     fun getAllSlugs(): Flow<List<String>>
 
-    @Query("SELECT COUNT(*) FROM bookmarks WHERE slug = :slug")
+    @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE slug = :slug)")
     fun isBookmarked(slug: String): Flow<Boolean>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
