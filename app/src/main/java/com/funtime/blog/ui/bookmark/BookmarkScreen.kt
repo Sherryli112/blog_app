@@ -24,7 +24,8 @@ fun BookmarkScreen(
     var pendingDeleteSlug by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("書籤") }) }
+        topBar = { TopAppBar(title = { Text("書籤") }) },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -55,6 +56,7 @@ fun BookmarkScreen(
                 }
                 else -> {
                     LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
@@ -64,6 +66,18 @@ fun BookmarkScreen(
                                 onClick = onArticleClick,
                                 onLongClick = { article.slug?.let { pendingDeleteSlug = it } }
                             )
+                        }
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "已顯示全部書籤",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }

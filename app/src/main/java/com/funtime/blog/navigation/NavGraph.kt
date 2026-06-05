@@ -1,9 +1,11 @@
 package com.funtime.blog.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,16 +17,18 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.funtime.blog.ui.article.ArticleDetailScreen
+import com.funtime.blog.ui.auth.AuthScreen
 import com.funtime.blog.ui.author.AuthorScreen
+import com.funtime.blog.ui.bookmark.BookmarkScreen
 import com.funtime.blog.ui.category.CategoryArticleListScreen
 import com.funtime.blog.ui.category.CategoryScreen
-import com.funtime.blog.ui.bookmark.BookmarkScreen
 import com.funtime.blog.ui.home.HomeScreen
+import com.funtime.blog.ui.passport.PassportScreen
+import com.funtime.blog.ui.profile.ProfileScreen
 import com.funtime.blog.ui.search.SearchScreen
-import java.net.URLDecoder
 import java.net.URLEncoder
 
-private val topLevelRoutes = setOf("home", "categories", "bookmarks")
+private val topLevelRoutes = setOf("home", "categories", "bookmarks", "profile")
 
 @Composable
 fun NavGraph() {
@@ -72,6 +76,18 @@ fun NavGraph() {
                         icon = { Icon(Icons.Default.Bookmark, contentDescription = "書籤") },
                         label = { Text("書籤") }
                     )
+                    NavigationBarItem(
+                        selected = currentRoute == "profile",
+                        onClick = {
+                            navController.navigate("profile") {
+                                popUpTo("home") { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = { Icon(Icons.Default.Person, contentDescription = "我的") },
+                        label = { Text("我的") }
+                    )
                 }
             }
         }
@@ -79,7 +95,7 @@ fun NavGraph() {
         NavHost(
             navController = navController,
             startDestination = "home",
-            modifier = Modifier
+            modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
                 HomeScreen(
@@ -96,14 +112,34 @@ fun NavGraph() {
                     }
                 )
             }
-            composable("search") {
+            composable(
+                route = "search?keyword={keyword}",
+                arguments = listOf(navArgument("keyword") { type = NavType.StringType; defaultValue = "" })
+            ) {
                 SearchScreen(
-                    onArticleClick = { slug -> navController.navigate("article/$slug") }
+                    onArticleClick = { slug -> navController.navigate("article/$slug") },
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable("bookmarks") {
                 BookmarkScreen(
                     onArticleClick = { slug -> navController.navigate("article/$slug") }
+                )
+            }
+            composable("profile") {
+                ProfileScreen(
+                    onLoginClick = { navController.navigate("login") },
+                    onArticleClick = { slug -> navController.navigate("article/$slug") },
+                    onPassportClick = { navController.navigate("passport") }
+                )
+            }
+            composable("passport") {
+                PassportScreen(onBack = { navController.popBackStack() })
+            }
+            composable("login") {
+                AuthScreen(
+                    onBack = { navController.popBackStack() },
+                    onSuccess = { navController.popBackStack() }
                 )
             }
             composable(
@@ -112,7 +148,12 @@ fun NavGraph() {
             ) {
                 ArticleDetailScreen(
                     onBack = { navController.popBackStack() },
-                    onAuthorClick = { slug -> navController.navigate("author/$slug") }
+                    onAuthorClick = { slug -> navController.navigate("author/$slug") },
+                    onTagClick = { keyword ->
+                        navController.navigate(
+                            "search?keyword=" + URLEncoder.encode(keyword, "UTF-8")
+                        )
+                    }
                 )
             }
             composable(

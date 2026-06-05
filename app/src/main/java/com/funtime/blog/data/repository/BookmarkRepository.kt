@@ -20,4 +20,6 @@ class BookmarkRepository @Inject constructor(
             dao.insert(BookmarkedArticle(slug = slug, bookmarkedAt = System.currentTimeMillis()))
         }
     }
+
+    suspend fun clearAll() = dao.deleteAll()
 }

@@ -32,6 +32,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.funtime.blog.data.api.dto.ArticleDetailDto
 import com.funtime.blog.data.api.dto.ArticleItemDto
 import org.json.JSONArray
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 private const val STRAPI_BASE_URL = "http://10.0.2.2:8787"
 private const val WEBSITE_BASE_URL = "https://www.funtime.com.tw/blog"
@@ -43,6 +45,7 @@ data class TocItem(val id: String, val text: String, val level: String)
 fun ArticleDetailScreen(
     onBack: () -> Unit,
     onAuthorClick: (slug: String) -> Unit = {},
+    onTagClick: (keyword: String) -> Unit = {},
     viewModel: ArticleDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -95,7 +98,8 @@ fun ArticleDetailScreen(
                     }
                 }
             )
-        }
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
         when {
             uiState.isLoading -> {
@@ -134,6 +138,13 @@ fun ArticleDetailScreen(
                                         }
                                         url.startsWith("funtime://article/") -> {
                                             // handled by NavGraph via recompose - store and navigate
+                                            true
+                                        }
+                                        url.startsWith("funtime://search/") -> {
+                                            val tag = URLDecoder.decode(
+                                                url.removePrefix("funtime://search/"), "UTF-8"
+                                            )
+                                            onTagClick(tag)
                                             true
                                         }
                                         else -> false
@@ -288,6 +299,10 @@ private fun buildHtml(article: ArticleDetailDto): String {
           .related-section h3 { margin-top: 0; color: #333; }
           .related-item { display: block; padding: 10px 0; border-bottom: 1px solid #eee; color: #333; text-decoration: none; font-size: 15px; }
           .related-item:active { opacity: 0.7; }
+          .tags-section { margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; }
+          .tags-section h4 { margin: 0 0 10px 0; font-size: 13px; color: #999; font-weight: normal; }
+          .tag-chip { display: inline-block; margin: 4px 6px 4px 0; padding: 5px 12px; background: #f5f5f5; border-radius: 16px; color: #f58900; text-decoration: none; font-size: 13px; }
+          .tag-chip:active { opacity: 0.6; }
         </style>
         </head>
         <body>
@@ -295,10 +310,20 @@ private fun buildHtml(article: ArticleDetailDto): String {
           ${if (metaLine.isNotEmpty()) """<div class="meta">$metaLine</div>""" else ""}
           <hr>
           ${article.content ?: ""}
+          ${buildTagsHtml(article.tags)}
           <div id="related-placeholder"></div>
         </body>
         </html>
     """.trimIndent()
+}
+
+private fun buildTagsHtml(tags: List<String>?): String {
+    if (tags.isNullOrEmpty()) return ""
+    val chips = tags.joinToString("") { tag ->
+        val encoded = URLEncoder.encode(tag, "UTF-8")
+        """<a href="funtime://search/$encoded" class="tag-chip">#$tag</a>"""
+    }
+    return """<div class="tags-section"><h4>相關標籤</h4>$chips</div>"""
 }
 
 private fun buildRelatedHtml(articles: List<ArticleItemDto>): String {

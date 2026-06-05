@@ -2,9 +2,15 @@ package com.funtime.blog.di
 
 import android.content.Context
 import androidx.room.Room
+import com.funtime.blog.data.api.AuthApiService
 import com.funtime.blog.data.api.BlogApiService
+import com.funtime.blog.data.local.AppDatabase
 import com.funtime.blog.data.local.BookmarkDao
-import com.funtime.blog.data.local.BookmarkDatabase
+import com.funtime.blog.data.local.CheckinDao
+import com.funtime.blog.data.local.PassportStampDao
+import com.funtime.blog.data.local.ReadingHistoryDao
+import com.funtime.blog.data.local.UserSessionDataStore
+import com.funtime.blog.data.local.UserStatsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,12 +30,35 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideBookmarkDatabase(@ApplicationContext context: Context): BookmarkDatabase =
-        Room.databaseBuilder(context, BookmarkDatabase::class.java, "bookmarks.db").build()
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "bookmarks.db")
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4)
+            .build()
 
     @Provides
     @Singleton
-    fun provideBookmarkDao(db: BookmarkDatabase): BookmarkDao = db.bookmarkDao()
+    fun provideBookmarkDao(db: AppDatabase): BookmarkDao = db.bookmarkDao()
+
+    @Provides
+    @Singleton
+    fun provideReadingHistoryDao(db: AppDatabase): ReadingHistoryDao = db.readingHistoryDao()
+
+    @Provides
+    @Singleton
+    fun provideCheckinDao(db: AppDatabase): CheckinDao = db.checkinDao()
+
+    @Provides
+    @Singleton
+    fun provideUserStatsDao(db: AppDatabase): UserStatsDao = db.userStatsDao()
+
+    @Provides
+    @Singleton
+    fun providePassportStampDao(db: AppDatabase): PassportStampDao = db.passportStampDao()
+
+    @Provides
+    @Singleton
+    fun provideUserSessionDataStore(@ApplicationContext context: Context): UserSessionDataStore =
+        UserSessionDataStore(context)
 
     @Provides
     @Singleton
@@ -53,4 +82,9 @@ object AppModule {
     @Singleton
     fun provideBlogApiService(retrofit: Retrofit): BlogApiService =
         retrofit.create(BlogApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAuthApiService(retrofit: Retrofit): AuthApiService =
+        retrofit.create(AuthApiService::class.java)
 }
