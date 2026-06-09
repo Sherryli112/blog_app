@@ -201,7 +201,7 @@ private fun DrawScope.drawFloralGlow(cx: Float, cy: Float, r: Float, color: Colo
 @Composable
 fun FloralAvatarFrame(username: String, level: Int, size: Dp = 80.dp) {
     val theme = floralTheme(level)
-    val padding = size * 0.34f
+    val padding = size * 0.22f
     val total = size + padding * 2
 
     val infiniteTransition = rememberInfiniteTransition(label = "floral")
@@ -222,9 +222,9 @@ fun FloralAvatarFrame(username: String, level: Int, size: Dp = 80.dp) {
             val cy = this.size.height / 2
             val avatarR = size.toPx() / 2
             val gap = padding.toPx()
-            val ringR = avatarR + gap * 0.5f
-            val fs = gap * 0.30f
-            val ls = gap * 0.22f
+            val ringR = avatarR + gap * 0.18f
+            val fs = gap * 0.38f
+            val ls = gap * 0.28f
 
             drawFloralGlow(cx, cy, ringR, theme.petalColor, theme.glowAlpha * 0.7f, gap * 0.32f)
 
