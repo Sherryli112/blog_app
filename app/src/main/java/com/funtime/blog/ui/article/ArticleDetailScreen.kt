@@ -263,19 +263,28 @@ private fun buildHtml(article: ArticleDetailDto): String {
 
     val metaLine = listOf(authorHtml, dateHtml).filter { it.isNotEmpty() }.joinToString(" &nbsp;·&nbsp; ")
 
+    val coverUrl = article.cover?.url?.let { url ->
+        if (url.startsWith("http")) url else "$STRAPI_BASE_URL$url"
+    }
+    val coverHtml = if (coverUrl != null) {
+        """<img src="$coverUrl" class="cover-image" alt="">"""
+    } else ""
+
     return """
         <!DOCTYPE html>
         <html>
         <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          body { font-family: sans-serif; padding: 16px; margin: 0; line-height: 1.8; color: #333; font-size: 16px; overflow-x: hidden; word-wrap: break-word; }
+          body { font-family: sans-serif; padding: 0; margin: 0; line-height: 1.8; color: #333; font-size: 16px; overflow-x: hidden; word-wrap: break-word; }
+          .cover-image { width: 100%; height: 220px; object-fit: cover; display: block; }
+          .content { padding: 16px; }
           h1.article-title { font-size: 22px; font-weight: bold; line-height: 1.4; margin: 0 0 8px 0; }
           .meta { font-size: 13px; color: #888; margin-bottom: 16px; }
           .author { color: #f58900; text-decoration: none; }
           a.author:active { opacity: 0.7; }
           hr { border: none; border-top: 1px solid #eee; margin: 16px 0; }
-          img { max-width: 100%; height: auto; border-radius: 4px; }
+          img:not(.cover-image) { max-width: 100%; height: auto; border-radius: 4px; }
           .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 12px 0; }
           table { border-collapse: collapse; min-width: 100%; }
           td, th { padding: 8px 12px; border: 1px solid #ddd; white-space: nowrap; font-size: 14px; }
@@ -291,11 +300,14 @@ private fun buildHtml(article: ArticleDetailDto): String {
         </style>
         </head>
         <body>
-          <h1 class="article-title">${article.title ?: ""}</h1>
-          ${if (metaLine.isNotEmpty()) """<div class="meta">$metaLine</div>""" else ""}
-          <hr>
-          ${article.content ?: ""}
-          <div id="related-placeholder"></div>
+          $coverHtml
+          <div class="content">
+            <h1 class="article-title">${article.title ?: ""}</h1>
+            ${if (metaLine.isNotEmpty()) """<div class="meta">$metaLine</div>""" else ""}
+            <hr>
+            ${article.content ?: ""}
+            <div id="related-placeholder"></div>
+          </div>
         </body>
         </html>
     """.trimIndent()
