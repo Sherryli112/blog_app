@@ -4,9 +4,15 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
+import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -52,6 +59,17 @@ fun ArticleDetailScreen(
     var showShareSheet by remember { mutableStateOf(false) }
     var showTocSheet by remember { mutableStateOf(false) }
     var tocItems by remember { mutableStateOf<List<TocItem>>(emptyList()) }
+    val showTitleState = remember { mutableStateOf(false) }
+    val showTitleInBar by showTitleState
+    val mainHandler = remember { Handler(Looper.getMainLooper()) }
+    val titleBridge = remember {
+        object : Any() {
+            @JavascriptInterface
+            fun onTitleVisibilityChange(hidden: Boolean) {
+                mainHandler.post { showTitleState.value = hidden }
+            }
+        }
+    }
 
     // 相關文章有了之後，注入到 WebView
     val relatedArticles = uiState.relatedArticles
@@ -69,7 +87,15 @@ fun ArticleDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {},
+                title = {
+                    AnimatedVisibility(visible = showTitleInBar, enter = fadeIn(), exit = fadeOut()) {
+                        Text(
+                            text = uiState.article?.title ?: "",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
@@ -163,6 +189,7 @@ fun ArticleDetailScreen(
                                 }
                             }
                             settings.javaScriptEnabled = true
+                            addJavascriptInterface(titleBridge, "Android")
                             loadDataWithBaseURL(
                                 STRAPI_BASE_URL,
                                 buildHtml(article),
@@ -308,6 +335,17 @@ private fun buildHtml(article: ArticleDetailDto): String {
             ${article.content ?: ""}
             <div id="related-placeholder"></div>
           </div>
+          <script>
+          (function(){
+            var h=document.querySelector('h1.article-title');
+            if(!h)return;
+            var prev=false;
+            window.addEventListener('scroll',function(){
+              var hidden=h.getBoundingClientRect().bottom<0;
+              if(hidden!==prev){prev=hidden;Android.onTitleVisibilityChange(hidden);}
+            },{passive:true});
+          })();
+          </script>
         </body>
         </html>
     """.trimIndent()
