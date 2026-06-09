@@ -22,19 +22,56 @@ import kotlin.math.*
 
 // ─── 色系定義 ────────────────────────────────────────────────────
 private data class FrameTheme(
-    val ring1: Color,   // 主環顏色 A
-    val ring2: Color,   // 主環顏色 B（漸層）
-    val accent: Color,  // 裝飾高光
-    val glow: Color,    // 發光顏色
-    val glowRadius: Float, // 1.0 = 標準發光強度
+    val ring1: Color,
+    val ring2: Color,
+    val accent: Color,
+    val glow: Color,
+    val glowRadius: Float,
 )
 
-private fun frameTheme(level: Int) = when (level) {
-    1 -> FrameTheme(Color(0xFF78909C), Color(0xFF37474F), Color(0xFFB0BEC5), Color(0xFF607D8B), 0.4f) // 鋼鐵灰
-    2 -> FrameTheme(Color(0xFFCD853F), Color(0xFF8B4513), Color(0xFFFFD54F), Color(0xFFBF8040), 0.5f) // 青銅
-    3 -> FrameTheme(Color(0xFFCFD8DC), Color(0xFF90A4AE), Color(0xFFFFFFFF), Color(0xFFB0BEC5), 0.55f) // 白銀
-    4 -> FrameTheme(Color(0xFFFFD740), Color(0xFFFF8F00), Color(0xFFFFFFFF), Color(0xFFFFD740), 0.75f) // 黃金
-    else -> FrameTheme(Color(0xFFFF6D00), Color(0xFFC62828), Color(0xFFFFD740), Color(0xFFFF6D00), 1.0f) // 傳奇
+enum class FrameVariant { DEFAULT, A, B, C }
+
+// 原版：通用遊戲配色（鋼鐵灰→青銅→銀→金→傳奇）
+private fun frameThemeDefault(level: Int) = when (level) {
+    1 -> FrameTheme(Color(0xFF78909C), Color(0xFF37474F), Color(0xFFB0BEC5), Color(0xFF607D8B), 0.4f)
+    2 -> FrameTheme(Color(0xFFCD853F), Color(0xFF8B4513), Color(0xFFFFD54F), Color(0xFFBF8040), 0.5f)
+    3 -> FrameTheme(Color(0xFFCFD8DC), Color(0xFF90A4AE), Color(0xFFFFFFFF), Color(0xFFB0BEC5), 0.55f)
+    4 -> FrameTheme(Color(0xFFFFD740), Color(0xFFFF8F00), Color(0xFFFFFFFF), Color(0xFFFFD740), 0.75f)
+    else -> FrameTheme(Color(0xFFFF6D00), Color(0xFFC62828), Color(0xFFFFD740), Color(0xFFFF6D00), 1.0f)
+}
+
+// 方案 A：越高等越橙，由冷灰過渡到品牌橙 #F58900
+private fun frameThemeA(level: Int) = when (level) {
+    1 -> FrameTheme(Color(0xFF78909C), Color(0xFF37474F), Color(0xFFB0BEC5), Color(0xFF546E7A), 0.4f)  // 冷灰藍
+    2 -> FrameTheme(Color(0xFFBF7A30), Color(0xFF8B4513), Color(0xFFE8A060), Color(0xFFBF7030), 0.5f)  // 暖棕橙
+    3 -> FrameTheme(Color(0xFFE8922A), Color(0xFFC06800), Color(0xFFFFD080), Color(0xFFE08020), 0.6f)  // 橙金
+    4 -> FrameTheme(Color(0xFFF58900), Color(0xFFFF6D00), Color(0xFFFFD740), Color(0xFFF58900), 0.8f)  // 品牌橙
+    else -> FrameTheme(Color(0xFFFF6500), Color(0xFFE53000), Color(0xFFF58900), Color(0xFFFF5000), 1.0f) // 深橙烈焰
+}
+
+// 方案 B：保留金銀銅進階感，accent 統一換成品牌橙，Lv5 全橙傳奇
+private fun frameThemeB(level: Int) = when (level) {
+    1 -> FrameTheme(Color(0xFF78909C), Color(0xFF37474F), Color(0xFFF58900), Color(0xFF607D8B), 0.4f)  // 灰環 + 橙點綴
+    2 -> FrameTheme(Color(0xFFCD853F), Color(0xFF8B4513), Color(0xFFF58900), Color(0xFFBF8040), 0.5f)  // 青銅 + 橙高光
+    3 -> FrameTheme(Color(0xFFCFD8DC), Color(0xFF90A4AE), Color(0xFFF58900), Color(0xFFB0BEC5), 0.55f) // 白銀 + 橙寶石
+    4 -> FrameTheme(Color(0xFFFFD740), Color(0xFFFF8F00), Color(0xFFF58900), Color(0xFFF58900), 0.8f)  // 黃金 + 橙發光
+    else -> FrameTheme(Color(0xFFF58900), Color(0xFFFF6D00), Color(0xFFFFD740), Color(0xFFF58900), 1.0f) // 純品牌橙傳奇
+}
+
+// 方案 C：全橙漸層，從淡棕橙到熔岩橙紅
+private fun frameThemeC(level: Int) = when (level) {
+    1 -> FrameTheme(Color(0xFFD4A574), Color(0xFF9E7040), Color(0xFFEBBF8A), Color(0xFFBF8850), 0.35f) // 淡橙棕
+    2 -> FrameTheme(Color(0xFFE0892A), Color(0xFFB06010), Color(0xFFF5C070), Color(0xFFD07820), 0.5f)  // 橙棕
+    3 -> FrameTheme(Color(0xFFF58900), Color(0xFFD06800), Color(0xFFFFCC44), Color(0xFFF08000), 0.65f) // 品牌橙
+    4 -> FrameTheme(Color(0xFFF58900), Color(0xFFFFD740), Color(0xFFFFFFFF), Color(0xFFF58900), 0.8f)  // 深橙金
+    else -> FrameTheme(Color(0xFFFF5200), Color(0xFFCC1000), Color(0xFFF58900), Color(0xFFFF4000), 1.0f) // 熔岩橙紅
+}
+
+private fun frameTheme(level: Int, variant: FrameVariant = FrameVariant.DEFAULT) = when (variant) {
+    FrameVariant.DEFAULT -> frameThemeDefault(level)
+    FrameVariant.A -> frameThemeA(level)
+    FrameVariant.B -> frameThemeB(level)
+    FrameVariant.C -> frameThemeC(level)
 }
 
 // ─── Canvas 輔助函式 ──────────────────────────────────────────────
@@ -260,8 +297,9 @@ fun HoKAvatarFrame(
     username: String,
     level: Int,
     size: Dp = 80.dp,
+    variant: FrameVariant = FrameVariant.DEFAULT,
 ) {
-    val theme = frameTheme(level)
+    val theme = frameTheme(level, variant)
     val padding = size * 0.36f
     val total = size + padding * 2
 
@@ -382,6 +420,66 @@ fun HoKAvatarFrame(
 }
 
 // ─── Preview ──────────────────────────────────────────────────────
+@Preview(showBackground = true, backgroundColor = 0xFF1A1A2E, name = "方案A：越高等越橙")
+@Composable
+private fun PreviewVariantA() {
+    MaterialTheme {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text("方案 A — 品牌橙漸強", color = Color.White, fontSize = 11.sp,
+                modifier = Modifier.padding(bottom = 8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                (1..5).forEach { lv ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        HoKAvatarFrame(username = "趣", level = lv, size = 52.dp, variant = FrameVariant.A)
+                        Spacer(Modifier.height(4.dp))
+                        Text("Lv$lv", fontSize = 9.sp, color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1A1A2E, name = "方案B：金銀銅+品牌橙點綴")
+@Composable
+private fun PreviewVariantB() {
+    MaterialTheme {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text("方案 B — 金銀銅框 + 品牌橙點綴", color = Color.White, fontSize = 11.sp,
+                modifier = Modifier.padding(bottom = 8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                (1..5).forEach { lv ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        HoKAvatarFrame(username = "趣", level = lv, size = 52.dp, variant = FrameVariant.B)
+                        Spacer(Modifier.height(4.dp))
+                        Text("Lv$lv", fontSize = 9.sp, color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1A1A2E, name = "方案C：全橙漸層")
+@Composable
+private fun PreviewVariantC() {
+    MaterialTheme {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text("方案 C — 全橙漸層（淡棕→熔岩）", color = Color.White, fontSize = 11.sp,
+                modifier = Modifier.padding(bottom = 8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                (1..5).forEach { lv ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        HoKAvatarFrame(username = "趣", level = lv, size = 52.dp, variant = FrameVariant.C)
+                        Spacer(Modifier.height(4.dp))
+                        Text("Lv$lv", fontSize = 9.sp, color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true, backgroundColor = 0xFF1A1A2E)
 @Composable
 private fun PreviewLoLFrames() {
