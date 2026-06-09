@@ -269,22 +269,33 @@ fun FloralAvatarFrame(username: String, level: Int, size: Dp = 80.dp) {
                 }
             }
 
-            // 散落花瓣（Lv3+）
+            // 散落花瓣（Lv3+）：朝向統一向外，不跟隨動畫旋轉，視覺穩定
             if (level >= 3) {
                 listOf(170.0, 295.0, 358.0).take(level - 2).forEach { a ->
-                    val rad = Math.toRadians(a + anim * 0.08)
-                    val px = cx + cos(rad).toFloat() * (ringR + gap * 0.15f)
-                    val py = cy + sin(rad).toFloat() * (ringR + gap * 0.15f)
-                    drawPetal(px, py, fs * 0.52f, (a + anim * 0.25f).toFloat(), theme.petalAccent.copy(alpha = 0.75f))
+                    val rad = Math.toRadians(a)
+                    val px = cx + cos(rad).toFloat() * (ringR + gap * 0.13f)
+                    val py = cy + sin(rad).toFloat() * (ringR + gap * 0.13f)
+                    drawPetal(px, py, fs * 0.50f, a.toFloat(), theme.petalAccent.copy(alpha = 0.72f))
                 }
             }
-            // Lv5 動態飄散花瓣
+            // Lv5：旋轉光暈環（取代不穩定的浮動花瓣）
             if (level >= 5) {
-                listOf(75.0, 165.0, 258.0, 342.0).forEach { a ->
-                    val rad = Math.toRadians(a + anim * 0.14)
-                    val px = cx + cos(rad).toFloat() * (ringR + gap * 0.28f)
-                    val py = cy + sin(rad).toFloat() * (ringR + gap * 0.28f)
-                    drawPetal(px, py, fs * 0.48f, (a + anim).toFloat(), theme.petalColor.copy(alpha = 0.68f))
+                rotate(anim * 0.4f, Offset(cx, cy)) {
+                    drawCircle(
+                        brush = Brush.sweepGradient(
+                            listOf(
+                                Color.Transparent,
+                                theme.petalColor.copy(alpha = 0.45f),
+                                Color.Transparent,
+                                theme.petalAccent.copy(alpha = 0.30f),
+                                Color.Transparent
+                            ),
+                            center = Offset(cx, cy)
+                        ),
+                        radius = ringR + gap * 0.16f,
+                        center = Offset(cx, cy),
+                        style = Stroke(width = 4.dp.toPx())
+                    )
                 }
             }
         }
