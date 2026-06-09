@@ -25,7 +25,9 @@ object AppModule {
     @Provides
     @Singleton
     fun provideBookmarkDatabase(@ApplicationContext context: Context): BookmarkDatabase =
-        Room.databaseBuilder(context, BookmarkDatabase::class.java, "bookmarks.db").build()
+        Room.databaseBuilder(context, BookmarkDatabase::class.java, "bookmarks.db")
+            .fallbackToDestructiveMigrationOnDowngrade(true)
+            .build()
 
     @Provides
     @Singleton
