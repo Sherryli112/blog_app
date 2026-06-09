@@ -33,7 +33,7 @@ import com.funtime.blog.data.local.UserStatsEntity
 import com.funtime.blog.data.repository.CheckinResult
 import com.funtime.blog.data.repository.PassportRepository
 import com.funtime.blog.data.repository.checkinXpForStreak
-import com.funtime.blog.ui.components.HoKAvatarFrame
+import com.funtime.blog.ui.components.FloralAvatarFrame
 
 private fun levelName(level: Int) = when (level) {
     1 -> "旅行新手"; 2 -> "旅遊愛好者"; 3 -> "城市探索者"; 4 -> "亞洲達人"; 5 -> "環球旅人"; else -> "旅行新手"
@@ -294,7 +294,7 @@ private fun LoggedInHeader(username: String, level: Int, onLogout: () -> Unit) {
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        HoKAvatarFrame(username = username, level = level, size = 56.dp)
+        FloralAvatarFrame(username = username, level = level, size = 56.dp)
         Spacer(Modifier.width(12.dp))
         Text(
             username,
