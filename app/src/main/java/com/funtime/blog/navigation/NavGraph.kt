@@ -21,6 +21,7 @@ import com.funtime.blog.ui.category.CategoryScreen
 import com.funtime.blog.ui.bookmark.BookmarkScreen
 import com.funtime.blog.ui.home.HomeScreen
 import com.funtime.blog.ui.search.SearchScreen
+import com.funtime.blog.ui.settings.SettingsScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -84,8 +85,12 @@ fun NavGraph() {
             composable("home") {
                 HomeScreen(
                     onArticleClick = { slug -> navController.navigate("article/$slug") },
-                    onSearchClick = { navController.navigate("search") }
+                    onSearchClick = { navController.navigate("search") },
+                    onSettingsClick = { navController.navigate("settings") }
                 )
+            }
+            composable("settings") {
+                SettingsScreen(onBack = { navController.popBackStack() })
             }
             composable("categories") {
                 CategoryScreen(

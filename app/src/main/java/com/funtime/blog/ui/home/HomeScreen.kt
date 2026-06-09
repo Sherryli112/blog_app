@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -24,6 +25,7 @@ import com.funtime.blog.ui.components.ArticleCard
 fun HomeScreen(
     onArticleClick: (slug: String) -> Unit,
     onSearchClick: () -> Unit,
+    onSettingsClick: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -61,6 +63,9 @@ fun HomeScreen(
             actions = {
                 IconButton(onClick = onSearchClick) {
                     Icon(Icons.Default.Search, contentDescription = "搜尋")
+                }
+                IconButton(onClick = onSettingsClick) {
+                    Icon(Icons.Default.Settings, contentDescription = "設定")
                 }
             }
         )

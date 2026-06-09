@@ -54,8 +54,14 @@ fun ArticleDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isBookmarked by viewModel.isBookmarked.collectAsStateWithLifecycle()
+    val fontSize by viewModel.fontSize.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val webViewRef = remember { mutableStateOf<WebView?>(null) }
+
+    // 字體大小變更時同步到 WebView
+    LaunchedEffect(fontSize) {
+        webViewRef.value?.settings?.textZoom = fontSize
+    }
     var showShareSheet by remember { mutableStateOf(false) }
     var showTocSheet by remember { mutableStateOf(false) }
     var tocItems by remember { mutableStateOf<List<TocItem>>(emptyList()) }
@@ -144,61 +150,74 @@ fun ArticleDetailScreen(
             }
             uiState.article != null -> {
                 val article = uiState.article!!
-                AndroidView(
-                    factory = { ctx ->
-                        WebView(ctx).apply {
-                            webViewClient = object : WebViewClient() {
-                                override fun shouldOverrideUrlLoading(
-                                    view: WebView?,
-                                    request: WebResourceRequest?
-                                ): Boolean {
-                                    val url = request?.url?.toString() ?: return false
-                                    return when {
-                                        url.startsWith("funtime://author/") -> {
-                                            onAuthorClick(url.removePrefix("funtime://author/"))
-                                            true
-                                        }
-                                        url.startsWith("funtime://article/") -> {
-                                            // handled by NavGraph via recompose - store and navigate
-                                            true
-                                        }
-                                        else -> false
-                                    }
-                                }
-
-                                override fun onPageFinished(view: WebView?, url: String?) {
-                                    webViewRef.value = view
-                                    // 取目錄
-                                    view?.evaluateJavascript(TOC_JS) { json ->
-                                        if (json != null && json != "null") {
-                                            try {
-                                                val arr = JSONArray(json)
-                                                tocItems = (0 until arr.length()).map { i ->
-                                                    val obj = arr.getJSONObject(i)
-                                                    TocItem(
-                                                        id = obj.getString("id"),
-                                                        text = obj.getString("text"),
-                                                        level = obj.getString("level")
-                                                    )
-                                                }
-                                            } catch (_: Exception) {}
-                                        }
-                                    }
-                                    // 包表格
-                                    view?.evaluateJavascript(TABLE_WRAP_JS, null)
-                                }
-                            }
-                            settings.javaScriptEnabled = true
-                            addJavascriptInterface(titleBridge, "Android")
-                            loadDataWithBaseURL(
-                                STRAPI_BASE_URL,
-                                buildHtml(article),
-                                "text/html", "UTF-8", null
+                Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                    if (uiState.isOffline) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "離線模式 · 顯示已快取版本",
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
                             )
                         }
-                    },
-                    modifier = Modifier.fillMaxSize().padding(innerPadding)
-                )
+                    }
+                    AndroidView(
+                        factory = { ctx ->
+                            WebView(ctx).apply {
+                                webViewClient = object : WebViewClient() {
+                                    override fun shouldOverrideUrlLoading(
+                                        view: WebView?,
+                                        request: WebResourceRequest?
+                                    ): Boolean {
+                                        val url = request?.url?.toString() ?: return false
+                                        return when {
+                                            url.startsWith("funtime://author/") -> {
+                                                onAuthorClick(url.removePrefix("funtime://author/"))
+                                                true
+                                            }
+                                            url.startsWith("funtime://article/") -> {
+                                                true
+                                            }
+                                            else -> false
+                                        }
+                                    }
+
+                                    override fun onPageFinished(view: WebView?, url: String?) {
+                                        webViewRef.value = view
+                                        view?.evaluateJavascript(TOC_JS) { json ->
+                                            if (json != null && json != "null") {
+                                                try {
+                                                    val arr = JSONArray(json)
+                                                    tocItems = (0 until arr.length()).map { i ->
+                                                        val obj = arr.getJSONObject(i)
+                                                        TocItem(
+                                                            id = obj.getString("id"),
+                                                            text = obj.getString("text"),
+                                                            level = obj.getString("level")
+                                                        )
+                                                    }
+                                                } catch (_: Exception) {}
+                                            }
+                                        }
+                                        view?.evaluateJavascript(TABLE_WRAP_JS, null)
+                                    }
+                                }
+                                settings.javaScriptEnabled = true
+                                settings.textZoom = fontSize
+                                addJavascriptInterface(titleBridge, "Android")
+                                loadDataWithBaseURL(
+                                    STRAPI_BASE_URL,
+                                    buildHtml(article),
+                                    "text/html", "UTF-8", null
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }

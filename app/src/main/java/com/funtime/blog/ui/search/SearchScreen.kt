@@ -19,7 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.funtime.blog.ui.components.ArticleCard
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SearchScreen(
     onArticleClick: (slug: String) -> Unit,
@@ -64,6 +64,32 @@ fun SearchScreen(
             keyboardActions = KeyboardActions(onSearch = { viewModel.search() })
         )
 
+        // 搜尋歷史（只在未搜尋且輸入框為空時顯示）
+        if (!uiState.hasSearched && uiState.query.isEmpty() && uiState.searchHistory.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("最近搜尋", style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                TextButton(onClick = viewModel::clearHistory) { Text("清除") }
+            }
+            FlowRow(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                uiState.searchHistory.forEach { query ->
+                    SuggestionChip(
+                        onClick = { viewModel.searchFromHistory(query) },
+                        label = { Text(query) }
+                    )
+                }
+            }
+        }
+
         when {
             pagerState.isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -81,8 +107,10 @@ fun SearchScreen(
                 }
             }
             !uiState.hasSearched -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("輸入標籤搜尋文章", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (uiState.searchHistory.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("輸入標籤搜尋文章", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
             else -> {

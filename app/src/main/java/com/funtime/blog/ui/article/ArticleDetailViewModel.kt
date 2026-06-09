@@ -7,6 +7,8 @@ import com.funtime.blog.data.api.dto.ArticleDetailDto
 import com.funtime.blog.data.api.dto.ArticleItemDto
 import com.funtime.blog.data.repository.ArticleRepository
 import com.funtime.blog.data.repository.BookmarkRepository
+import com.funtime.blog.data.repository.CacheRepository
+import com.funtime.blog.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,13 +23,16 @@ data class ArticleDetailUiState(
     val isLoading: Boolean = false,
     val article: ArticleDetailDto? = null,
     val relatedArticles: List<ArticleItemDto> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val isOffline: Boolean = false
 )
 
 @HiltViewModel
 class ArticleDetailViewModel @Inject constructor(
     private val repository: ArticleRepository,
     private val bookmarkRepository: BookmarkRepository,
+    private val cacheRepository: CacheRepository,
+    settingsRepository: SettingsRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -38,6 +43,9 @@ class ArticleDetailViewModel @Inject constructor(
 
     val isBookmarked: StateFlow<Boolean> = bookmarkRepository.isBookmarked(slug)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val fontSize: StateFlow<Int> = settingsRepository.fontSize
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 100)
 
     fun toggleBookmark() {
         viewModelScope.launch { bookmarkRepository.toggle(slug) }
@@ -52,10 +60,16 @@ class ArticleDetailViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
                 val article = repository.getArticleBySlug(slug)
-                _uiState.update { it.copy(isLoading = false, article = article) }
+                cacheRepository.save(article)
+                _uiState.update { it.copy(isLoading = false, article = article, isOffline = false) }
                 loadRelatedArticles(article)
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, error = e.message) }
+                val cached = cacheRepository.get(slug)
+                if (cached != null) {
+                    _uiState.update { it.copy(isLoading = false, article = cached, isOffline = true) }
+                } else {
+                    _uiState.update { it.copy(isLoading = false, error = e.message) }
+                }
             }
         }
     }
