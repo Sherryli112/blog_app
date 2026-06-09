@@ -475,17 +475,16 @@ fun CuteAvatarFrame(username: String, level: Int, size: Dp = 80.dp) {
 
 // ─── Previews ────────────────────────────────────────────────────────
 
-@Preview(showBackground = true, backgroundColor = 0xFF1C1008, name = "花環框（參考圖1風格）")
+@Preview(showBackground = true, backgroundColor = 0xFF1C1008, widthDp = 420, name = "花環框（參考圖1風格）")
 @Composable
 private fun PreviewFloral() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text("花環框 FloralAvatarFrame", color = Color(0xFFFFCC88), fontSize = 11.sp, modifier = Modifier.padding(bottom = 8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text("花環框 FloralAvatarFrame", color = Color(0xFFFFCC88), fontSize = 11.sp, modifier = Modifier.padding(bottom = 6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
                 (1..5).forEach { lv ->
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        FloralAvatarFrame(username = "趣", level = lv, size = 52.dp)
-                        Spacer(Modifier.height(4.dp))
+                        FloralAvatarFrame(username = "趣", level = lv, size = 44.dp)
                         Text("Lv$lv", fontSize = 9.sp, color = Color.White)
                     }
                 }
@@ -494,17 +493,16 @@ private fun PreviewFloral() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1C1008, name = "藤蔓框（參考圖2風格）")
+@Preview(showBackground = true, backgroundColor = 0xFF1C1008, widthDp = 420, name = "藤蔓框（參考圖2風格）")
 @Composable
 private fun PreviewVine() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text("藤蔓框 VineAvatarFrame", color = Color(0xFFFFCC88), fontSize = 11.sp, modifier = Modifier.padding(bottom = 8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text("藤蔓框 VineAvatarFrame", color = Color(0xFFFFCC88), fontSize = 11.sp, modifier = Modifier.padding(bottom = 6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
                 (1..5).forEach { lv ->
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        VineAvatarFrame(username = "趣", level = lv, size = 52.dp)
-                        Spacer(Modifier.height(4.dp))
+                        VineAvatarFrame(username = "趣", level = lv, size = 44.dp)
                         Text("Lv$lv", fontSize = 9.sp, color = Color.White)
                     }
                 }
@@ -513,17 +511,16 @@ private fun PreviewVine() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1C1008, name = "可愛雙環框（參考圖3風格）")
+@Preview(showBackground = true, backgroundColor = 0xFF1C1008, widthDp = 420, name = "可愛雙環框（參考圖3風格）")
 @Composable
 private fun PreviewCute() {
     MaterialTheme {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text("可愛雙環框 CuteAvatarFrame", color = Color(0xFFFFCC88), fontSize = 11.sp, modifier = Modifier.padding(bottom = 8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text("可愛雙環框 CuteAvatarFrame", color = Color(0xFFFFCC88), fontSize = 11.sp, modifier = Modifier.padding(bottom = 6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
                 (1..5).forEach { lv ->
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CuteAvatarFrame(username = "趣", level = lv, size = 52.dp)
-                        Spacer(Modifier.height(4.dp))
+                        CuteAvatarFrame(username = "趣", level = lv, size = 44.dp)
                         Text("Lv$lv", fontSize = 9.sp, color = Color.White)
                     }
                 }
