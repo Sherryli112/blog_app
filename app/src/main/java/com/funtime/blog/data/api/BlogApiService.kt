@@ -27,7 +27,7 @@ interface BlogApiService {
 
     @GET("articles")
     suspend fun searchArticles(
-        @Query("filters[tags][name][\$eq]") tag: String,
+        @Query("filters[tags][name][\$containsi]") tag: String,
         @Query("sort") sort: String = "custom_published_at:desc",
         @Query("pagination[page]") page: Int = 1,
         @Query("pagination[pageSize]") pageSize: Int = 10

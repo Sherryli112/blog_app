@@ -58,10 +58,6 @@ fun ArticleDetailScreen(
     val context = LocalContext.current
     val webViewRef = remember { mutableStateOf<WebView?>(null) }
 
-    // 字體大小變更時同步到 WebView
-    LaunchedEffect(fontSize) {
-        webViewRef.value?.settings?.textZoom = fontSize
-    }
     var showShareSheet by remember { mutableStateOf(false) }
     var showTocSheet by remember { mutableStateOf(false) }
     var tocItems by remember { mutableStateOf<List<TocItem>>(emptyList()) }
@@ -214,6 +210,9 @@ fun ArticleDetailScreen(
                                     "text/html", "UTF-8", null
                                 )
                             }
+                        },
+                        update = { webView ->
+                            webView.settings.textZoom = fontSize
                         },
                         modifier = Modifier.fillMaxSize()
                     )
