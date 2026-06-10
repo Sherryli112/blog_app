@@ -10,10 +10,12 @@ import com.funtime.blog.data.repository.BookmarkRepository
 import com.funtime.blog.data.repository.CacheRepository
 import com.funtime.blog.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -47,8 +49,15 @@ class ArticleDetailViewModel @Inject constructor(
     val fontSize: StateFlow<Int> = settingsRepository.fontSize
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 100)
 
+    private val _bookmarkEvent = Channel<Boolean>(Channel.BUFFERED)
+    val bookmarkEvent = _bookmarkEvent.receiveAsFlow()
+
     fun toggleBookmark() {
-        viewModelScope.launch { bookmarkRepository.toggle(slug) }
+        viewModelScope.launch {
+            val wasBookmarked = isBookmarked.value
+            bookmarkRepository.toggle(slug)
+            _bookmarkEvent.send(!wasBookmarked)
+        }
     }
 
     init {

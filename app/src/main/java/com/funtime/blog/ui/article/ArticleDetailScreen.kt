@@ -57,6 +57,13 @@ fun ArticleDetailScreen(
     val fontSize by viewModel.fontSize.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val webViewRef = remember { mutableStateOf<WebView?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.bookmarkEvent.collect { added ->
+            snackbarHostState.showSnackbar(if (added) "已加入書籤" else "已移除書籤")
+        }
+    }
 
     var showShareSheet by remember { mutableStateOf(false) }
     var showTocSheet by remember { mutableStateOf(false) }
@@ -87,6 +94,7 @@ fun ArticleDetailScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
