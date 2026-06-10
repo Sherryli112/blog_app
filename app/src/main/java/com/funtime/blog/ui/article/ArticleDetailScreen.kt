@@ -160,62 +160,60 @@ fun ArticleDetailScreen(
                             )
                         }
                     }
-                    AndroidView(
-                        factory = { ctx ->
-                            WebView(ctx).apply {
-                                webViewClient = object : WebViewClient() {
-                                    override fun shouldOverrideUrlLoading(
-                                        view: WebView?,
-                                        request: WebResourceRequest?
-                                    ): Boolean {
-                                        val url = request?.url?.toString() ?: return false
-                                        return when {
-                                            url.startsWith("funtime://author/") -> {
-                                                onAuthorClick(url.removePrefix("funtime://author/"))
-                                                true
+                    key(fontSize) {
+                        AndroidView(
+                            factory = { ctx ->
+                                WebView(ctx).apply {
+                                    webViewClient = object : WebViewClient() {
+                                        override fun shouldOverrideUrlLoading(
+                                            view: WebView?,
+                                            request: WebResourceRequest?
+                                        ): Boolean {
+                                            val url = request?.url?.toString() ?: return false
+                                            return when {
+                                                url.startsWith("funtime://author/") -> {
+                                                    onAuthorClick(url.removePrefix("funtime://author/"))
+                                                    true
+                                                }
+                                                url.startsWith("funtime://article/") -> {
+                                                    true
+                                                }
+                                                else -> false
                                             }
-                                            url.startsWith("funtime://article/") -> {
-                                                true
-                                            }
-                                            else -> false
                                         }
-                                    }
 
-                                    override fun onPageFinished(view: WebView?, url: String?) {
-                                        webViewRef.value = view
-                                        view?.evaluateJavascript(TOC_JS) { json ->
-                                            if (json != null && json != "null") {
-                                                try {
-                                                    val arr = JSONArray(json)
-                                                    tocItems = (0 until arr.length()).map { i ->
-                                                        val obj = arr.getJSONObject(i)
-                                                        TocItem(
-                                                            id = obj.getString("id"),
-                                                            text = obj.getString("text"),
-                                                            level = obj.getString("level")
-                                                        )
-                                                    }
-                                                } catch (_: Exception) {}
+                                        override fun onPageFinished(view: WebView?, url: String?) {
+                                            webViewRef.value = view
+                                            view?.evaluateJavascript(TOC_JS) { json ->
+                                                if (json != null && json != "null") {
+                                                    try {
+                                                        val arr = JSONArray(json)
+                                                        tocItems = (0 until arr.length()).map { i ->
+                                                            val obj = arr.getJSONObject(i)
+                                                            TocItem(
+                                                                id = obj.getString("id"),
+                                                                text = obj.getString("text"),
+                                                                level = obj.getString("level")
+                                                            )
+                                                        }
+                                                    } catch (_: Exception) {}
+                                                }
                                             }
+                                            view?.evaluateJavascript(TABLE_WRAP_JS, null)
                                         }
-                                        view?.evaluateJavascript(TABLE_WRAP_JS, null)
                                     }
+                                    settings.javaScriptEnabled = true
+                                    addJavascriptInterface(titleBridge, "Android")
+                                    loadDataWithBaseURL(
+                                        STRAPI_BASE_URL,
+                                        buildHtml(article, fontSize),
+                                        "text/html", "UTF-8", null
+                                    )
                                 }
-                                settings.javaScriptEnabled = true
-                                settings.textZoom = fontSize
-                                addJavascriptInterface(titleBridge, "Android")
-                                loadDataWithBaseURL(
-                                    STRAPI_BASE_URL,
-                                    buildHtml(article),
-                                    "text/html", "UTF-8", null
-                                )
-                            }
-                        },
-                        update = { webView ->
-                            webView.settings.textZoom = fontSize
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    )
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
         }
@@ -294,7 +292,7 @@ fun ArticleDetailScreen(
 
 // ── HTML 建構 ────────────────────────────────────────────────────────────────
 
-private fun buildHtml(article: ArticleDetailDto): String {
+private fun buildHtml(article: ArticleDetailDto, fontSizePct: Int = 100): String {
     val authorHtml = article.author?.let { author ->
         if (author.slug != null)
             """<a href="funtime://author/${author.slug}" class="author">${author.name ?: ""}</a>"""
@@ -321,26 +319,27 @@ private fun buildHtml(article: ArticleDetailDto): String {
         <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          body { font-family: sans-serif; padding: 0; margin: 0; line-height: 1.8; color: #333; font-size: 16px; overflow-x: hidden; word-wrap: break-word; }
+          html { font-size: ${fontSizePct}%; }
+          body { font-family: sans-serif; padding: 0; margin: 0; line-height: 1.8; color: #333; font-size: 1rem; overflow-x: hidden; word-wrap: break-word; }
           .cover-image { width: 100%; height: 220px; object-fit: cover; display: block; }
           .content { padding: 16px; }
-          h1.article-title { font-size: 22px; font-weight: bold; line-height: 1.4; margin: 0 0 8px 0; }
-          .meta { font-size: 13px; color: #888; margin-bottom: 16px; }
+          h1.article-title { font-size: 1.375rem; font-weight: bold; line-height: 1.4; margin: 0 0 8px 0; }
+          .meta { font-size: 0.8125rem; color: #888; margin-bottom: 16px; }
           .author { color: #f58900; text-decoration: none; }
           a.author:active { opacity: 0.7; }
           hr { border: none; border-top: 1px solid #eee; margin: 16px 0; }
           img:not(.cover-image) { max-width: 100%; height: auto; border-radius: 4px; }
           .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 12px 0; }
           table { border-collapse: collapse; min-width: 100%; }
-          td, th { padding: 8px 12px; border: 1px solid #ddd; white-space: nowrap; font-size: 14px; }
+          td, th { padding: 8px 12px; border: 1px solid #ddd; white-space: nowrap; font-size: 0.875rem; }
           th { background-color: #f5f5f5; font-weight: bold; }
-          h2 { font-size: 20px; margin-top: 24px; }
-          h3 { font-size: 18px; margin-top: 16px; }
+          h2 { font-size: 1.25rem; margin-top: 24px; }
+          h3 { font-size: 1.125rem; margin-top: 16px; }
           p { margin: 12px 0; }
           a { color: #f58900; }
           .related-section { margin-top: 32px; padding-top: 16px; border-top: 2px solid #f58900; }
           .related-section h3 { margin-top: 0; color: #333; }
-          .related-item { display: block; padding: 10px 0; border-bottom: 1px solid #eee; color: #333; text-decoration: none; font-size: 15px; }
+          .related-item { display: block; padding: 10px 0; border-bottom: 1px solid #eee; color: #333; text-decoration: none; font-size: 0.9375rem; }
           .related-item:active { opacity: 0.7; }
         </style>
         </head>
