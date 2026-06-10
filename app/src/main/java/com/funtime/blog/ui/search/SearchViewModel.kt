@@ -32,7 +32,7 @@ class SearchViewModel @Inject constructor(
     private val _hasSearched = MutableStateFlow(false)
 
     private val pager = PaginationHelper(viewModelScope) { page ->
-        val resp = repository.searchArticles(tag = _query.value.trim(), page = page)
+        val resp = repository.searchArticles(query = _query.value.trim(), page = page)
         Pair(resp.data, resp.meta.pagination.pageCount)
     }
 

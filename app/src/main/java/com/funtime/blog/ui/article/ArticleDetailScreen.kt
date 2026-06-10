@@ -58,6 +58,12 @@ fun ArticleDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isBookmarked by viewModel.isBookmarked.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(Unit) {
+        viewModel.bookmarkEvent.collect { added ->
+            snackbarHostState.showSnackbar(if (added) "已加入書籤" else "已移除書籤")
+        }
+    }
     val webViewRef = remember { mutableStateOf<WebView?>(null) }
     var showShareSheet by remember { mutableStateOf(false) }
     var showTocSheet by remember { mutableStateOf(false) }
@@ -88,6 +94,7 @@ fun ArticleDetailScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {

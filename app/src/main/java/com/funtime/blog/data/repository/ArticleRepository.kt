@@ -31,8 +31,8 @@ class ArticleRepository @Inject constructor(
         apiService.getArticlesByCategory(theme = theme, category = category, pageSize = 6)
             .data.filter { it.slug != excludeSlug }.take(5)
 
-    suspend fun searchArticles(tag: String, page: Int = 1): ArticleListResponseDto =
-        apiService.searchArticles(tag = tag, page = page)
+    suspend fun searchArticles(query: String, page: Int = 1): ArticleListResponseDto =
+        apiService.searchArticles(title = query, excerpt = query, tag = query, content = query, page = page)
 
     suspend fun getArticlesByAuthor(authorSlug: String, page: Int = 1): ArticleListResponseDto =
         apiService.getArticlesByAuthor(authorSlug = authorSlug, page = page)

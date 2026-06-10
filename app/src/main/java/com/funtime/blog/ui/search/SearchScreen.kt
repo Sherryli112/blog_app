@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -57,8 +58,15 @@ fun SearchScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            placeholder = { Text("輸入關鍵字（標籤）") },
+            placeholder = { Text("搜尋文章") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            trailingIcon = {
+                if (uiState.query.isNotEmpty()) {
+                    IconButton(onClick = { viewModel.updateQuery("") }) {
+                        Icon(Icons.Default.Close, contentDescription = "清除")
+                    }
+                }
+            },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = { viewModel.search() })
@@ -82,7 +90,7 @@ fun SearchScreen(
             }
             !uiState.hasSearched -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("輸入標籤搜尋文章", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("輸入關鍵字搜尋文章", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             else -> {
