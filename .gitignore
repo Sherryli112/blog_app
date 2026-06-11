@@ -16,3 +16,8 @@ local.properties
 
 # 本地備忘
 notes/
+
+# Worker
+worker/.dev.vars
+worker/node_modules/
+worker/.wrangler/

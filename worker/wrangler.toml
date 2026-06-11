@@ -1,0 +1,9 @@
+name = "funtime-blog-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+STRAPI_BASE_URL = "https://ft-test02.funtravel.com.tw"
+
+[dev]
+port = 8787
