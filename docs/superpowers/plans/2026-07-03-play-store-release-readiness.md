@@ -242,14 +242,17 @@ import java.util.Properties
 
 > 這樣設計是讓沒有 `keystore.properties` 的環境（例如其他人 clone 這個 repo）依然能編譯 debug/release，只是 release 不會被簽署——不會因為缺密鑰檔就直接建置失敗。
 
-- [ ] **Step 6: 確認 release build 產出成功**
+- [x] **Step 6: 確認 release build 產出成功** ✅ 2026-07-03
 
 Run: `./gradlew bundleRelease`
 Expected: BUILD SUCCESSFUL，且產生 `app/build/outputs/bundle/release/app-release.aab`
+實際結果：BUILD SUCCESSFUL in 1m 53s，`signReleaseBundle` task 有執行（代表簽署密碼正確套用，密碼錯誤會直接建置失敗），產出 `app-release.aab`（4.8MB）。
 
-- [ ] **Step 7: 安裝 release APK 到實機測試混淆後功能正常**
+- [x] **Step 7: 產出 release APK** ✅ 2026-07-03（尚待人工安裝到實機驗證功能）
 
-Run: `./gradlew assembleRelease` 然後手動安裝 `app/build/outputs/apk/release/app-release.apk` 到實機，走過：首頁列表 → 文章詳情（含圖片、tags）→ 搜尋 → 書籤 → 作者頁，確認沒有因為混淆造成的白屏或 crash（Gson 反射相關最容易在這裡爆掉）。
+Run: `./gradlew assembleRelease`
+實際結果：BUILD SUCCESSFUL，產出 `app/build/outputs/apk/release/app-release.apk`（2.3MB）。
+**待辦（人工）：** 手動安裝這個 APK 到實機，走過首頁列表 → 文章詳情（含圖片、tags）→ 搜尋 → 書籤 → 作者頁，確認沒有因為混淆造成的白屏或 crash（Gson 反射相關最容易在這裡爆掉）。
 
 - [ ] **Step 8: Commit（只 commit 程式碼，keystore.properties 和 .jks 檔案不會被加入，因為已在 .gitignore）**
 
