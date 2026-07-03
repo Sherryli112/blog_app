@@ -36,11 +36,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.funtime.blog.data.NetworkConfig
 import com.funtime.blog.data.api.dto.ArticleDetailDto
 import com.funtime.blog.data.api.dto.ArticleItemDto
 import org.json.JSONArray
 
-private const val STRAPI_BASE_URL = "http://10.0.2.2:8787"
 private const val WEBSITE_BASE_URL = "https://www.funtime.com.tw/blog"
 
 data class TocItem(val id: String, val text: String, val level: String)
@@ -213,7 +213,7 @@ fun ArticleDetailScreen(
                                     settings.javaScriptEnabled = true
                                     addJavascriptInterface(titleBridge, "Android")
                                     loadDataWithBaseURL(
-                                        STRAPI_BASE_URL,
+                                        NetworkConfig.BASE_URL,
                                         buildHtml(article, fontSize),
                                         "text/html", "UTF-8", null
                                     )
@@ -315,7 +315,7 @@ private fun buildHtml(article: ArticleDetailDto, fontSizePct: Int = 100): String
     val metaLine = listOf(authorHtml, dateHtml).filter { it.isNotEmpty() }.joinToString(" &nbsp;·&nbsp; ")
 
     val coverUrl = article.cover?.url?.let { url ->
-        if (url.startsWith("http")) url else "$STRAPI_BASE_URL$url"
+        if (url.startsWith("http")) url else "${NetworkConfig.BASE_URL}$url"
     }
     val coverHtml = if (coverUrl != null) {
         """<img src="$coverUrl" class="cover-image" alt="">"""

@@ -14,9 +14,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.funtime.blog.data.NetworkConfig
 import com.funtime.blog.data.api.dto.ArticleItemDto
-
-private const val STRAPI_BASE_URL = "http://10.0.2.2:8787"
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -27,7 +26,7 @@ fun ArticleCard(
     onLongClick: ((String) -> Unit)? = null
 ) {
     val coverUrl = article.cover?.url?.let {
-        if (it.startsWith("http")) it else "$STRAPI_BASE_URL$it"
+        if (it.startsWith("http")) it else "${NetworkConfig.BASE_URL}$it"
     }
 
     Card(

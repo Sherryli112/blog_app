@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.room.Room
+import com.funtime.blog.data.NetworkConfig
 import com.funtime.blog.data.api.BlogApiService
 import com.funtime.blog.data.local.BookmarkDao
 import com.funtime.blog.data.local.BookmarkDatabase
@@ -28,8 +29,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    private const val BASE_URL = "http://10.0.2.2:8787/"
 
     @Provides
     @Singleton
@@ -75,7 +74,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl("${NetworkConfig.BASE_URL}/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
