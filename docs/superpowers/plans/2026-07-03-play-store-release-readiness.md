@@ -340,7 +340,12 @@ git commit -m "fix: App 圖示改用品牌橘色系，移除預設機器人圖�
 
 ### Task 6: 商店素材與文案準備（非程式碼，人工執行）
 
-- [ ] Play Console 用的 512×512 App 圖示 PNG（可以拿 Task 5 的橘底白 F 設計直接輸出成 PNG，或等正式 logo）
+> 素材來源：`funtime_website/frontend/public` 已有現成品牌素材可直接沿用，不用重新設計：
+> - `logo/header_logo_c.svg`：官網 header 向量字標（FUNTIME 全字，色號 `#f58900` 與 App 的 `BrandOrange` 一致，Task 5 的 App 圖示前景已直接抽取其中的 F 字形路徑）
+> - `icon/favicon.png`（48×48）：橘底白色 "FUN TIME" 方形徽章，風格可作為 512px 商店圖示的參考基準，但解析度太低不能直接放大用
+> - `funtime.png`（82×73）：白底 "FUN TIME" 完整字標，O 以定位圖釘造型呈現，適合商店文案配圖或 feature graphic 使用
+
+- [ ] Play Console 用的 512×512 App 圖示 PNG（用 `header_logo_c.svg` 的向量重新排版成方形構圖後輸出，畫質才夠；不要直接放大 `favicon.png`）
 - [ ] Feature Graphic 1024×500 px
 - [ ] 手機截圖至少 2 張（建議 5–8 張：首頁、文章詳情、分類、搜尋、書籤）
 - [ ] 應用程式名稱（≤30 字元）、簡短說明（≤80 字元）、完整說明（≤4000 字元）
