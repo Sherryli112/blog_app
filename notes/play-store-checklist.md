@@ -97,6 +97,28 @@
 - [ ] 審核通過後取得測試連結，實際安裝驗證一次完整流程
 - [ ] （之後才做）確認開放測試穩定後，同一版本升級到正式版軌道
 
+## 九、master 分支同步修改（0.0.2）
+
+> 以上一到八都是 **pre-gamification** 分支的進度。master 分支另外在做登入/打卡/護照章等 gamification 功能，同一天也套用了等效的 CMS 存取修正，準備上傳成同一個「FunTime部落格」App 底下的第二個版本。**這節記錄的是 master 分支的獨立狀態**，跟上面章節是不同程式碼。
+
+- [x] master 原本 5 個檔案各自寫死 `http://10.0.2.2:8787`（比 pre-gamification 更早期，沒有集中的 NetworkConfig），已全部改掉 ✅ 2026-07-07
+      - `BlogApiService`（讀文章/地區）→ 改打 `www.funtime.com.tw/api/proxy`（不需 Token）
+      - `AuthApiService`（登入/註冊/取得使用者資料）→ **直接打 `mgmt.funtime.com.tw`**——因為 `/api/proxy` 會固定用官網服務端 Token 覆蓋 Authorization 標頭，沒辦法轉發使用者自己的 JWT，`users/me` 這類需要身分的 API 會拿到錯的資料。改直接打正式機，手機真實網路 IP 預期不會被 Cloudflare Bot Fight Mode 判定為可疑（跟雲端伺服器發出的請求不同）——**這點還沒實機驗證**，待測
+      - 圖片 → 改打 `upd-api.funtime.com.tw`
+      - 實作方式：`AppModule.kt` 拆成兩組具名 Retrofit（`@Named("blog")` / `@Named("auth")`）
+- [x] master 原本完全沒有 release 簽署設定，補上跟 pre-gamification 一致的 `signingConfigs`（沿用同一把 keystore）✅ 2026-07-07
+- [x] 開啟 `isMinifyEnabled` + 補 `proguard-rules.pro` 的 Retrofit/Gson DTO keep 規則 ✅ 2026-07-07
+- [x] `versionCode` 1→2、`versionName` 改 `0.0.2`（避免跟 pre-gamification 已上傳的版本 1 衝突）✅ 2026-07-07
+- [x] 移除 `usesCleartextTraffic` ✅ 2026-07-07
+- [x] `.gitignore` 補上 `keystore.properties` / `*.jks`（master 原本沒排除，差點把簽署密碼提交進 git）✅ 2026-07-07
+- [x] `bundleRelease` / `assembleRelease` 建置成功，簽署正常 ✅ 2026-07-07
+- [ ] 模擬器測試卡在開機失敗（環境問題，跟稍早黑畫面同一台裝置），尚未在裝置上實測，改用 Play Store 內部測試流程直接實機驗證
+- [x] 已 commit + push 到 `origin/master`（commit `8a1e285`）✅ 2026-07-07
+- [ ] 上傳這份 AAB 到 Play Console「FunTime部落格」→ 內部測試（同一個 App，第二個版本 0.0.2）
+- [ ] 實機驗證：文章列表/圖片正常 + 登入/取得使用者資料（`getMe`）在直接打 `mgmt.funtime.com.tw` 的情況下不會被 Cloudflare 擋、能正確帶回使用者自己的資料
+
+AAB 位置：`app/build/outputs/bundle/release/app-release.aab`——⚠️ 這個路徑在兩個分支底下是不同檔案，要看哪個版本得先 `git checkout` 到對應分支再確認檔案時間戳記。
+
 ---
 
-最後更新：2026-07-07（內部測試版本已成功發布，待取得加入連結實機安裝驗證）
+最後更新：2026-07-07（新增 master 分支 0.0.2 進度；pre-gamification 內部測試版本已成功發布，待取得加入連結實機安裝驗證）
