@@ -1,14 +1,34 @@
 # Google Play 上架檢查清單
 
-> **目標軌道：開放測試（Open testing）**——不是內部測試、也還不是正式上架。目的是實際跑一次 Google 審核流程、了解需要準備什麼。開放測試需要完整商店資訊、內容分級、Data safety 表單，跟正式上架的準備工作高度重疊，所以下面清單不能省略商店素材跟隱私政策。
+> **兩階段目標**：先用**內部測試（Internal testing）**快速驗證 release build 能不能透過 Play Store 正常安裝、運作；接著再補齊完整資料，走**開放測試（公開測試，Open testing）**實際跑一次 Google 審核流程。內部測試、公開測試是各自獨立的軌道，不衝突，建立一個不影響之後建立另一個。
 >
 > 開放測試 vs 正式上架的差異：開放測試任何人可透過連結加入，但**不會出現在 Play 商店正常搜尋結果**；正式上架才會公開可搜尋。之後要轉正式版，同一個已上傳的版本可以直接升級軌道，不用重傳。
 
+## 零、快速路徑：先做內部測試（Internal Testing）
+
+目標：最少步驟，把 release build 透過 Play Store 正式安裝管道裝到手機上測一次。下面每項都對應到後面完整清單的某個項目，這裡只是抓出「內部測試現在就要用到」的最小集合、並排好順序。
+
+- [x] 產生 release keystore ✅（2026-07-03 已完成，位於 `C:\Users\jiaxinli\keystores\funtime-release.jks`，忘記了一度以為沒做過）
+- [x] keystore 備份到安全地方（遺失無法更新 App！）—— ⚠️ 目前只放在本機這台電腦，建議另外備份一份到雲端/其他地方
+- [x] 用新 keystore 執行 `./gradlew bundleRelease`，產出正式簽名的 AAB ✅ 2026-07-07 重新驗證成功
+- [x] 用 `./gradlew assembleRelease` 產出的 release APK 在模擬器測過 ✅ 2026-07-07，R8 混淆後網路連線／文章列表皆正常（200 OK 拿到真實文章 JSON，無 crash）
+- [x] Play Console →「FunTime部落格」→ 測試及發布 → **內部測試** → 建立新版本，上傳 AAB ✅ 2026-07-07
+- [x] 填寫版本資訊（release 標籤填「0.0.1」）✅ 2026-07-07
+- [x] 新增測試人員名單 ✅ 2026-07-07（已加入公司內部人員 email）
+- [x] **內部測試版本已成功發布** ✅ 2026-07-07 下午5:36（狀態：提供給內部測試人員，App bundle 版本 1 (1.0)，1.74 MB）
+- [ ] 取得內部測試的**加入連結（opt-in link）**（Play Console「測試人員」分頁會有）
+- [ ] 用這個連結，透過 **Play Store 正式安裝流程**（不是 adb/Android Studio 直接裝）把 App 裝到手機上
+- [ ] 驗證核心功能：文章列表、文章詳情、圖片、搜尋/分類皆正常
+
+內部測試跑通之後，回到下面「四、隱私政策」「五、商店頁面素材」「六、內容分級 + Data safety」把還沒打勾的項目補齊，再到 Play Console 建立「**公開測試**」軌道，送同一份（或更新版）AAB 審核。
+
 ## 一、帳號
 
-- [ ] 申請 Google Play Console 帳號（play.google.com/console）
-- [ ] 付 $25 美元一次性開發者費用（信用卡）
-- [ ] 等待帳號審核通過（1–2 天）
+- [x] 公司已有 Google Play Console **機構帳戶**「方探科技」✅ 2026-07-07（截圖：`Downloads\BUG_IMAGE\app申請.png`）
+      帳戶 ID：5688686205590403843，已通過 Android 開發人員驗證，裡面已有另一個 App「趣旅行」（`com.funtime.funtrip`，草稿/內部測試）
+      不用重新申請、不用再付一次 $25
+- [x] 帳戶權限已到位（`jiaxinli@funtime.com.tw` 可存取「方探科技」帳戶）✅ 2026-07-07
+- [x] 已用「建立應用程式」建立 App「**FunTime部落格**」✅ 2026-07-07（套件名稱 `com.funtime.blog`）
 
 ## 二、App 簽署（Signing）
 
@@ -26,7 +46,7 @@
 - [x] 產出 release AAB：./gradlew bundleRelease ✅ 2026-07-03
       輸出：app/build/outputs/bundle/release/app-release.aab（已驗證簽署成功）
 - [x] versionCode 從 1 開始 ✅（目前 `app/build.gradle.kts` 是 1，正式上傳前不用再改）
-- [ ] versionName 決定對外版本號（目前是 "1.0"，可維持或改 "1.0.0"，開放測試階段不強制）
+- [x] versionName 維持 "1.0" 即可 ✅（Play Console 內部測試版本自己標的「0.0.1」是主控台的 release 標籤，跟這裡的 versionName 是兩回事，不用對齊，開放測試前才需要正式決定）
 
 ## 四、隱私政策（開放測試必填）
 
@@ -71,7 +91,7 @@
 
 ## 八、提交審核（開放測試軌道）
 
-- [ ] Play Console 建立 App（名稱、預設語言、App/遊戲、免費/付費）
+- [x] Play Console 建立 App ✅ 2026-07-07（見一、帳號）
 - [ ] 上傳 AAB 到 Play Console → **開放測試（Open testing）軌道**（不是正式版）
 - [ ] 提交審核（開放測試審核通常比正式版快，但仍需等待）
 - [ ] 審核通過後取得測試連結，實際安裝驗證一次完整流程
@@ -79,4 +99,4 @@
 
 ---
 
-最後更新：2026-07-03（改為以「開放測試」為目標，重新排序優先順序）
+最後更新：2026-07-07（內部測試版本已成功發布，待取得加入連結實機安裝驗證）
