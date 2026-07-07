@@ -89,7 +89,7 @@ fun AuthorScreen(
                             modifier = Modifier.padding(bottom = 8.dp)
                         ) {
                             uiState.author?.avatar?.url?.let { url ->
-                                val fullUrl = if (url.startsWith("http")) url else "${NetworkConfig.BASE_URL}$url"
+                                val fullUrl = if (url.startsWith("http")) url else "${NetworkConfig.IMAGE_BASE_URL}$url"
                                 AsyncImage(
                                     model = fullUrl,
                                     contentDescription = uiState.author?.name,

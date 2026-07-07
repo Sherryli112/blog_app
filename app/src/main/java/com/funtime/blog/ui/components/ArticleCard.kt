@@ -26,7 +26,7 @@ fun ArticleCard(
     onLongClick: ((String) -> Unit)? = null
 ) {
     val coverUrl = article.cover?.url?.let {
-        if (it.startsWith("http")) it else "${NetworkConfig.BASE_URL}$it"
+        if (it.startsWith("http")) it else "${NetworkConfig.IMAGE_BASE_URL}$it"
     }
 
     Card(

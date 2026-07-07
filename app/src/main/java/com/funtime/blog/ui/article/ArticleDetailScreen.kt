@@ -315,7 +315,7 @@ private fun buildHtml(article: ArticleDetailDto, fontSizePct: Int = 100): String
     val metaLine = listOf(authorHtml, dateHtml).filter { it.isNotEmpty() }.joinToString(" &nbsp;·&nbsp; ")
 
     val coverUrl = article.cover?.url?.let { url ->
-        if (url.startsWith("http")) url else "${NetworkConfig.BASE_URL}$url"
+        if (url.startsWith("http")) url else "${NetworkConfig.IMAGE_BASE_URL}$url"
     }
     val coverHtml = if (coverUrl != null) {
         """<img src="$coverUrl" class="cover-image" alt="">"""
