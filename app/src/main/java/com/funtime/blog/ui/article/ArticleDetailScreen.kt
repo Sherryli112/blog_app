@@ -42,7 +42,8 @@ import org.json.JSONArray
 import java.net.URLDecoder
 import java.net.URLEncoder
 
-private const val STRAPI_BASE_URL = "http://10.0.2.2:8787"
+private const val STRAPI_BASE_URL = "https://www.funtime.com.tw/api/proxy"
+private const val IMAGE_BASE_URL = "https://upd-api.funtime.com.tw"
 private const val WEBSITE_BASE_URL = "https://www.funtime.com.tw/blog"
 
 data class TocItem(val id: String, val text: String, val level: String)
@@ -309,7 +310,7 @@ private fun buildHtml(article: ArticleDetailDto): String {
     val metaLine = listOf(authorHtml, dateHtml).filter { it.isNotEmpty() }.joinToString(" &nbsp;·&nbsp; ")
 
     val coverUrl = article.cover?.url?.let { url ->
-        if (url.startsWith("http")) url else "$STRAPI_BASE_URL$url"
+        if (url.startsWith("http")) url else "$IMAGE_BASE_URL$url"
     }
     val coverHtml = if (coverUrl != null) {
         """<img src="$coverUrl" class="cover-image" alt="">"""

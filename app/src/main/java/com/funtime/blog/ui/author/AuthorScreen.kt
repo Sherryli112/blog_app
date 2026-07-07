@@ -21,7 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.funtime.blog.ui.components.ArticleCard
 
-private const val STRAPI_BASE_URL = "http://10.0.2.2:8787"
+private const val IMAGE_BASE_URL = "https://upd-api.funtime.com.tw"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +90,7 @@ fun AuthorScreen(
                             modifier = Modifier.padding(bottom = 8.dp)
                         ) {
                             uiState.author?.avatar?.url?.let { url ->
-                                val fullUrl = if (url.startsWith("http")) url else "$STRAPI_BASE_URL$url"
+                                val fullUrl = if (url.startsWith("http")) url else "$IMAGE_BASE_URL$url"
                                 AsyncImage(
                                     model = fullUrl,
                                     contentDescription = uiState.author?.name,

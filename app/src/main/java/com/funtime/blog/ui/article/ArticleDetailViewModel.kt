@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val STRAPI_BASE_URL = "http://10.0.2.2:8787"
+private const val IMAGE_BASE_URL = "https://upd-api.funtime.com.tw"
 
 data class ArticleDetailUiState(
     val isLoading: Boolean = false,
@@ -97,7 +97,7 @@ class ArticleDetailViewModel @Inject constructor(
         val title = article.title ?: return
         val rawCoverUrl = article.cover?.url
         val coverUrl = rawCoverUrl?.let {
-            if (it.startsWith("http")) it else "$STRAPI_BASE_URL$it"
+            if (it.startsWith("http")) it else "$IMAGE_BASE_URL$it"
         }
         viewModelScope.launch {
             val session = authRepository.sessionFlow.first()

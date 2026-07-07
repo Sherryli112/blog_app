@@ -21,3 +21,7 @@ notes/
 worker/.dev.vars
 worker/node_modules/
 worker/.wrangler/
+
+# Release 簽署（密鑰/密碼，絕對不能進版控）
+keystore.properties
+*.jks

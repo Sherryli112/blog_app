@@ -20,13 +20,23 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private const val BASE_URL = "http://10.0.2.2:8787/"
+    // 文章/地區資料：改打官網既有、不需 Token 的公開代理路由。
+    // 正式機 mgmt.funtime.com.tw 開了 Cloudflare Bot Fight Mode，會擋下雲端伺服器/App
+    // 這類非瀏覽器來源的請求，改走官網 Next.js 的 /api/proxy（Server 端已內建 Strapi Token）。
+    private const val BLOG_BASE_URL = "https://www.funtime.com.tw/api/proxy/"
+
+    // 登入/使用者資料：需要原封不動轉發使用者自己的 JWT，/api/proxy 會固定用官網服務端
+    // Token 覆蓋 Authorization 標頭、不能套用，改直接打正式機。手機真實網路 IP 不是雲端
+    // 機房網段，不會被 Bot Fight Mode 判定為可疑流量（跟 www.funtime.com.tw/api/proxy
+    // 的情況不同，那是雲端伺服器發出的請求才會被擋）。
+    private const val AUTH_BASE_URL = "https://mgmt.funtime.com.tw/api/"
 
     @Provides
     @Singleton
@@ -77,20 +87,31 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
+    @Named("blog")
+    fun provideBlogRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BLOG_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
     @Provides
     @Singleton
-    fun provideBlogApiService(retrofit: Retrofit): BlogApiService =
+    @Named("auth")
+    fun provideAuthRetrofit(okHttpClient: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(AUTH_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideBlogApiService(@Named("blog") retrofit: Retrofit): BlogApiService =
         retrofit.create(BlogApiService::class.java)
 
     @Provides
     @Singleton
-    fun provideAuthApiService(retrofit: Retrofit): AuthApiService =
+    fun provideAuthApiService(@Named("auth") retrofit: Retrofit): AuthApiService =
         retrofit.create(AuthApiService::class.java)
 }

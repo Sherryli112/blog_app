@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.funtime.blog.data.api.dto.ArticleItemDto
 
-private const val STRAPI_BASE_URL = "http://10.0.2.2:8787"
+private const val IMAGE_BASE_URL = "https://upd-api.funtime.com.tw"
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -27,7 +27,7 @@ fun ArticleCard(
     onLongClick: ((String) -> Unit)? = null
 ) {
     val coverUrl = article.cover?.url?.let {
-        if (it.startsWith("http")) it else "$STRAPI_BASE_URL$it"
+        if (it.startsWith("http")) it else "$IMAGE_BASE_URL$it"
     }
 
     Card(
