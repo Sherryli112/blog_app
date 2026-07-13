@@ -20,6 +20,15 @@
 - [ ] 用這個連結，透過 **Play Store 正式安裝流程**（不是 adb/Android Studio 直接裝）把 App 裝到手機上
 - [ ] 驗證核心功能：文章列表、文章詳情、圖片、搜尋/分類皆正常
 
+### 第二版（0.0.2）— 圖示更新
+
+- [x] 圖示改用官網真實 Logo（沿用 master 分支方案）+ 修正 monochrome/背景既有 bug ✅ 2026-07-13
+- [x] versionCode 2 / versionName 0.0.2，`bundleRelease` 建置簽署成功 ✅ 2026-07-13
+- [ ] commit 推上 `origin/pre-gamification`
+- [ ] Play Console →「FunTime部落格」→ 內部測試 → 建立新版本，上傳這份 AAB
+- [ ] 填寫版本資訊（release 標籤可填「0.0.2」）
+- [ ] 發布後用手機（透過 Play Store 加入連結，非 adb 安裝）實機驗證圖示顯示正常，尤其留意有開「佈景主題圖示」的 Android 13+ 裝置
+
 內部測試跑通之後，回到下面「四、隱私政策」「五、商店頁面素材」「六、內容分級 + Data safety」把還沒打勾的項目補齊，再到 Play Console 建立「**公開測試**」軌道，送同一份（或更新版）AAB 審核。
 
 ## 一、帳號
@@ -43,10 +52,10 @@
 
 ## 三、AAB
 
-- [x] 產出 release AAB：./gradlew bundleRelease ✅ 2026-07-03
-      輸出：app/build/outputs/bundle/release/app-release.aab（已驗證簽署成功）
-- [x] versionCode 從 1 開始 ✅（目前 `app/build.gradle.kts` 是 1，正式上傳前不用再改）
-- [x] versionName 維持 "1.0" 即可 ✅（Play Console 內部測試版本自己標的「0.0.1」是主控台的 release 標籤，跟這裡的 versionName 是兩回事，不用對齊，開放測試前才需要正式決定）
+- [x] 產出 release AAB：./gradlew bundleRelease ✅ 2026-07-03（版本 1／1.0，已上傳）
+- [x] 第二版：versionCode 1→2、versionName 改 "0.0.2" ✅ 2026-07-13
+      輸出：app/build/outputs/bundle/release/app-release.aab（已重新建置、簽署成功）
+      ⚠️ 這個 versionCode=2 會跟 master 分支目前本機的 versionCode=2（0.0.2，尚未上傳）撞號——這邊先實際上傳，master 那份如果之後也要傳，需要再把 versionCode 改成 3，避免 Play Console 拒收（同一個 App 底下 versionCode 必須跨分支嚴格遞增，不看是哪個分支）
 
 ## 四、隱私政策（開放測試必填）
 
@@ -59,6 +68,8 @@
 ## 五、商店頁面素材（開放測試必填，不能省略）
 
 - [x] App launcher 圖示改用品牌橘色系（取代 Android 預設機器人）✅ 2026-07-03
+- [x] App 圖示改用官網 favicon.png 銳化放大版本（取代先前向量重繪的 F 字形近似圖案，跟 master 分支同步）✅ 2026-07-13
+      同時修正 adaptive icon 背景 pathData 缺角（原本只畫出三角形）與 monochrome 圖層沿用彩色前景（Android 13+ 佈景主題圖示會變純色色塊）這兩個既有 bug
 - [ ] Play Console 用 512 × 512 px PNG（用 `funtime_website/frontend/public/logo/header_logo_c.svg` 向量重新排版輸出，畫質才夠）
 - [ ] Feature Graphic：1024 × 500 px（開放測試通常必填，正式上架也要）
 - [ ] 手機截圖：**至少 2 張**（開放測試門檻，正式上架建議 5–8 張）——直接用手機/模擬器對著 App 截圖即可，不用特別設計
@@ -121,4 +132,4 @@ AAB 位置：`app/build/outputs/bundle/release/app-release.aab`——⚠️ 這�
 
 ---
 
-最後更新：2026-07-07（新增 master 分支 0.0.2 進度；pre-gamification 內部測試版本已成功發布，待取得加入連結實機安裝驗證）
+最後更新：2026-07-13（pre-gamification 分支圖示同步更新為官網真實 Logo、修正 monochrome 與背景 pathData 既有 bug，產出 versionCode 2／0.0.2 簽署 AAB，準備上傳第二版內部測試；master 分支後續若要上傳需將 versionCode 改為 3 以上）
