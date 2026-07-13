@@ -54,8 +54,9 @@
 
 - [x] 產出 release AAB：./gradlew bundleRelease ✅ 2026-07-03（版本 1／1.0，已上傳）
 - [x] 第二版：versionCode 1→2、versionName 改 "0.0.2" ✅ 2026-07-13
-      輸出：app/build/outputs/bundle/release/app-release.aab（已重新建置、簽署成功）
       ~~⚠️ 跟 master 分支 versionCode 撞號~~ 不用擔心了 —— 2026-07-13 確認 master 不會上架
+- [x] versionCode 2→3 ✅ 2026-07-13 —— 上傳時 Play Console 回報「版本代碼 2 已經使用過」（先刪除草稿又重新上傳同一個 versionCode，但 Google 端不會釋放已用過的 versionCode，即使該版本被刪除／從未真正發布），versionName 維持 "0.0.2" 不變
+      輸出：app/build/outputs/bundle/release/app-release.aab（已重新建置、簽署成功）
 
 ## 四、隱私政策（開放測試必填）
 
