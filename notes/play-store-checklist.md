@@ -55,7 +55,7 @@
 - [x] 產出 release AAB：./gradlew bundleRelease ✅ 2026-07-03（版本 1／1.0，已上傳）
 - [x] 第二版：versionCode 1→2、versionName 改 "0.0.2" ✅ 2026-07-13
       輸出：app/build/outputs/bundle/release/app-release.aab（已重新建置、簽署成功）
-      ⚠️ 這個 versionCode=2 會跟 master 分支目前本機的 versionCode=2（0.0.2，尚未上傳）撞號——這邊先實際上傳，master 那份如果之後也要傳，需要再把 versionCode 改成 3，避免 Play Console 拒收（同一個 App 底下 versionCode 必須跨分支嚴格遞增，不看是哪個分支）
+      ~~⚠️ 跟 master 分支 versionCode 撞號~~ 不用擔心了 —— 2026-07-13 確認 master 不會上架
 
 ## 四、隱私政策（開放測試必填）
 
@@ -108,9 +108,9 @@
 - [ ] 審核通過後取得測試連結，實際安裝驗證一次完整流程
 - [ ] （之後才做）確認開放測試穩定後，同一版本升級到正式版軌道
 
-## 九、master 分支同步修改（0.0.2）
+## 九、master 分支同步修改（0.0.2，⚠️ 已確認不會上架）
 
-> 以上一到八都是 **pre-gamification** 分支的進度。master 分支另外在做登入/打卡/護照章等 gamification 功能，同一天也套用了等效的 CMS 存取修正，準備上傳成同一個「FunTime部落格」App 底下的第二個版本。**這節記錄的是 master 分支的獨立狀態**，跟上面章節是不同程式碼。
+> 以上一到八都是 **pre-gamification** 分支的進度，也是**實際會拿去上架/內測的分支**。master 分支的登入/打卡/護照章等 gamification 功能屬於實驗性質（正式產品目前沒有登入系統），**2026-07-13 確認 master 不會上傳到 Play Console**，之前提到的「versionCode 需改 3 避免撞號」也就不用處理了。這節保留 master 當天做過的 CMS 存取修正紀錄，僅供參考，不代表待辦。
 
 - [x] master 原本 5 個檔案各自寫死 `http://10.0.2.2:8787`（比 pre-gamification 更早期，沒有集中的 NetworkConfig），已全部改掉 ✅ 2026-07-07
       - `BlogApiService`（讀文章/地區）→ 改打 `www.funtime.com.tw/api/proxy`（不需 Token）
@@ -125,11 +125,10 @@
 - [x] `bundleRelease` / `assembleRelease` 建置成功，簽署正常 ✅ 2026-07-07
 - [ ] 模擬器測試卡在開機失敗（環境問題，跟稍早黑畫面同一台裝置），尚未在裝置上實測，改用 Play Store 內部測試流程直接實機驗證
 - [x] 已 commit + push 到 `origin/master`（commit `8a1e285`）✅ 2026-07-07
-- [ ] 上傳這份 AAB 到 Play Console「FunTime部落格」→ 內部測試（同一個 App，第二個版本 0.0.2）
-- [ ] 實機驗證：文章列表/圖片正常 + 登入/取得使用者資料（`getMe`）在直接打 `mgmt.funtime.com.tw` 的情況下不會被 Cloudflare 擋、能正確帶回使用者自己的資料
+- [x] ~~上傳這份 AAB 到 Play Console~~ **不需要** —— 2026-07-13 確認 master 不會上架，維持本機建置驗證即可
 
 AAB 位置：`app/build/outputs/bundle/release/app-release.aab`——⚠️ 這個路徑在兩個分支底下是不同檔案，要看哪個版本得先 `git checkout` 到對應分支再確認檔案時間戳記。
 
 ---
 
-最後更新：2026-07-13（pre-gamification 分支圖示同步更新為官網真實 Logo、修正 monochrome 與背景 pathData 既有 bug，產出 versionCode 2／0.0.2 簽署 AAB，準備上傳第二版內部測試；master 分支後續若要上傳需將 versionCode 改為 3 以上）
+最後更新：2026-07-13（確認 master 分支 gamification 功能屬實驗性質、不會上架，正式內測與上架皆以 pre-gamification 為主；pre-gamification 分支圖示同步更新為官網真實 Logo、修正 monochrome 與背景 pathData 既有 bug，產出 versionCode 2／0.0.2 簽署 AAB，準備上傳第二版內部測試）
