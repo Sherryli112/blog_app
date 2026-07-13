@@ -24,8 +24,10 @@
 
 - [x] 圖示改用官網真實 Logo（沿用 master 分支方案）+ 修正 monochrome/背景既有 bug ✅ 2026-07-13
 - [x] versionCode 2 / versionName 0.0.2，`bundleRelease` 建置簽署成功 ✅ 2026-07-13
-- [ ] commit 推上 `origin/pre-gamification`
-- [ ] Play Console →「FunTime部落格」→ 內部測試 → 建立新版本，上傳這份 AAB
+- [x] commit 推上 `origin/pre-gamification` ✅ 2026-07-13
+- [x] 上傳到 Play Console 內部測試時 versionCode 2 被拒（已用過，見「三、AAB」），改用 versionCode 3 重新建置 ✅ 2026-07-13
+- [x] 上傳後出現「App Bundle 含原生程式碼，未上傳偵錯符號檔」警告 —— **確認可忽略**：AAB 內僅有的兩個 `.so`（`libandroidx.graphics.path.so`、`libdatastore_shared_counter.so`）都是 Google Jetpack 函式庫內建的預編譯原生檔，不是專案自己的 NDK 程式碼，符號檔掌握在 Google 手上、開發者無法補，純提示不擋上傳 ✅ 2026-07-13
+- [ ] Play Console 完成「發布到內部測試」（不是只按儲存，要點下一步的發布按鈕）
 - [ ] 填寫版本資訊（release 標籤可填「0.0.2」）
 - [ ] 發布後用手機（透過 Play Store 加入連結，非 adb 安裝）實機驗證圖示顯示正常，尤其留意有開「佈景主題圖示」的 Android 13+ 裝置
 
@@ -132,4 +134,4 @@ AAB 位置：`app/build/outputs/bundle/release/app-release.aab`——⚠️ 這�
 
 ---
 
-最後更新：2026-07-13（確認 master 分支 gamification 功能屬實驗性質、不會上架，正式內測與上架皆以 pre-gamification 為主；pre-gamification 分支圖示同步更新為官網真實 Logo、修正 monochrome 與背景 pathData 既有 bug，產出 versionCode 2／0.0.2 簽署 AAB，準備上傳第二版內部測試）
+最後更新：2026-07-13（確認 master 分支 gamification 功能屬實驗性質、不會上架，正式內測與上架皆以 pre-gamification 為主；pre-gamification 分支圖示同步更新為官網真實 Logo、修正 monochrome 與背景 pathData 既有 bug；第二版上傳過程處理了 versionCode 撞號〔改用 3〕與原生偵錯符號檔警告〔確認可忽略〕，待完成「發布到內部測試」最後一步）
