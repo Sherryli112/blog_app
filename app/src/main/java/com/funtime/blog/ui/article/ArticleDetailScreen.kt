@@ -321,6 +321,14 @@ private fun buildHtml(article: ArticleDetailDto, fontSizePct: Int = 100): String
         """<img src="$coverUrl" class="cover-image" alt="">"""
     } else ""
 
+    // CMS 文章內文的圖片網址是 Strapi 富文本編輯器存檔時烘焙進去的絕對網址，
+    // 一律指向 mgmt.funtime.com.tw（內部管理用主機），外部行動網路會被擋下載不出來
+    // （iOS 版實機測試已證實），改寫成對外公開的 IMAGE_BASE_URL 主機。
+    val safeContent = article.content?.replace(
+        "https://mgmt.funtime.com.tw",
+        NetworkConfig.IMAGE_BASE_URL
+    ) ?: ""
+
     return """
         <!DOCTYPE html>
         <html>
@@ -357,7 +365,7 @@ private fun buildHtml(article: ArticleDetailDto, fontSizePct: Int = 100): String
             <h1 class="article-title">${article.title ?: ""}</h1>
             ${if (metaLine.isNotEmpty()) """<div class="meta">$metaLine</div>""" else ""}
             <hr>
-            ${article.content ?: ""}
+            $safeContent
             <div id="related-placeholder"></div>
           </div>
           <script>
