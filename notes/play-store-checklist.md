@@ -99,7 +99,11 @@
       原因：CMS 正式機 `mgmt.funtime.com.tw` 的 Cloudflare Bot Fight Mode 會擋下非瀏覽器（雲端伺服器/App）發出的請求。
       解法：`NetworkConfig.BASE_URL` 改打官網既有、不需 Token 的公開路由 `https://www.funtime.com.tw/api/proxy`；圖片改用 `NetworkConfig.IMAGE_BASE_URL = https://upd-api.funtime.com.tw`。
       已用 debug build 在模擬器實測成功（文章列表/內容/圖片皆正常）。
-- [ ] **用新 keystore 重新產出的 release build 再測一次**（debug build 已驗證過，但 release 有開 R8 混淆，理論上不影響網路層，仍建議實測一次）
+- [x] 修正文章內文圖片載不出來的問題 ✅ 2026-07-17
+      原因：iOS 版今天在 TestFlight 用真機（行動網路/家用 WiFi）測試發現 `mgmt.funtime.com.tw`（CMS 內部管理主機）對外部網路會被擋下 403，只有公司內網連得到；Android 這邊雖然封面圖已經用 `IMAGE_BASE_URL`（upd-api），但**文章內文（`article.content`）是 Strapi 富文本編輯器存檔時烘焙好的絕對網址，一律指向 mgmt**，不會經過 `IMAGE_BASE_URL` 的組網址邏輯，同樣會受影響。
+      解法：`ArticleDetailScreen.kt` 的 `buildHtml()` 組出內文 HTML 前，把 `article.content` 裡的 `mgmt.funtime.com.tw` 字串替換成 `NetworkConfig.IMAGE_BASE_URL`（upd-api）。
+      ⚠️ 這個 bug 在先前 code review 曾經被驗證過一次、判定「REFUTED」（因為抽查文章當時圖片能正常載入），但當時是在公司內網／模擬器測試，沒有真的用外部行動網路測過，才沒踩到——之後如果類似的網域限制問題被排查掉，記得回頭確認是不是測試環境本身就在內網、掩蓋了問題。
+- [ ] **用新 keystore 重新產出的 release build 再測一次，且務必用真機關掉公司 WiFi、走行動網路測試圖片顯示**（debug build 已驗證過，但 release 有開 R8 混淆，理論上不影響網路層，仍建議實測一次；圖片主機問題只有外部網路才會現形，模擬器/公司網路測不出來）
 - [ ] android:allowBackup 決定是否保留（預設 true）
 - [ ] targetSdk >= 34（目前是 36，OK）
 
