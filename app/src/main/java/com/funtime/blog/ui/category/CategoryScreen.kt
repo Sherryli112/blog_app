@@ -51,6 +51,18 @@ fun CategoryScreen(
                     }
                 }
             }
+            uiState.regions.isEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "目前沒有可瀏覽的分類",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             else -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(innerPadding),
